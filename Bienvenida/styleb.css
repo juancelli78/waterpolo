@@ -232,40 +232,40 @@ footer {
     en algunos dispositivos táctiles.
   */
   -webkit-tap-highlight-color: transparent;
-  background: rgba(255, 0, 0, 0.4) !important;
-  border: 2px solid red !important;
+  /* background: rgba(255, 0, 0, 0.4) !important;
+  border: 2px solid red !important; */
 }
 /* =========================================================
    1. PC / DESKTOP (Horizontal)
 ========================================================= */
 @media (min-width: 1025px) and (orientation: landscape) {
   .pantalla {
-    background-image: url("../img/fondo-pc.jpg");
+    background-image: url("./img/fondo-pc.jpg");
     background-size: 100% 100%;
   }
 
   .zona-cronometro {
-    left: 11.2%;
-    top: 48%;
-    width: 14.5vw;
+    left: 21%;
+    top: 51%;
+    width: 12vw;
     aspect-ratio: 1/1;
   }
   .zona-control {
-    left: 32.8%;
-    top: 48%;
-    width: 14.5vw;
+    left: 42%;
+    top: 51%;
+    width: 12vw;
     aspect-ratio: 1/1;
   }
   .zona-marcador-a {
-    left: 54.1%;
-    top: 48%;
-    width: 14.5vw;
+    left: 60%;
+    top: 51%;
+    width: 12vw;
     aspect-ratio: 1/1;
   }
   .zona-marcador-b {
-    left: 75.3%;
-    top: 48%;
-    width: 14.5vw;
+    left: 80%;
+    top: 51%;
+    width: 12vw;
     aspect-ratio: 1/1;
   }
 }
@@ -275,31 +275,31 @@ footer {
 ========================================================= */
 @media (min-width: 1025px) and (orientation: portrait) {
   .pantalla {
-    background-image: url("../img/fondo-ipad.jpg");
+    background-image: url("./img/fondo-pc.jpg");
     background-size: 100% 100%;
   }
 
   .zona-cronometro {
     left: 18%;
-    top: 46%;
+    top: 60%;
     width: 18vw;
     aspect-ratio: 1/1;
   }
   .zona-control {
     left: 38%;
-    top: 46%;
+    top: 60%;
     width: 18vw;
     aspect-ratio: 1/1;
   }
   .zona-marcador-a {
     left: 58%;
-    top: 46%;
+    top: 60%;
     width: 18vw;
     aspect-ratio: 1/1;
   }
   .zona-marcador-b {
     left: 78%;
-    top: 46%;
+    top: 60%;
     width: 18vw;
     aspect-ratio: 1/1;
   }
@@ -310,7 +310,7 @@ footer {
 ========================================================= */
 @media (min-width: 700px) and (max-width: 1400px) and (orientation: landscape) {
   .pantalla {
-    background-image: url("../img/fondo-ipad.jpg");
+    background-image: url("./img/fondo-ipad.jpg");
     background-size: 100% 100%;
   }
 
@@ -345,7 +345,7 @@ footer {
 ========================================================= */
 @media (min-width: 601px) and (max-width: 1024px) and (orientation: portrait) {
   .pantalla {
-    background-image: url("../img/fondo-ipad.jpg");
+    background-image: url("./img/fondo-ipad.jpg");
     background-size: 100% 100%;
   }
 
@@ -380,7 +380,7 @@ footer {
 ========================================================= */
 @media (max-width: 700px) and (orientation: landscape) {
   .pantalla {
-    background-image: url("../img/fondo-pc.jpg");
+    background-image: url("./img/fondo-mobile.jpg");
     background-size: 100% 100%;
   }
 
@@ -415,7 +415,7 @@ footer {
 ========================================================= */
 @media (max-width: 700px) and (orientation: portrait) {
   .pantalla {
-    background-image: url("../img/fondo-mobile.jpg");
+    background-image: url("./img/fondo-mobile.jpg");
     background-size: 100% 100%;
   }
 
