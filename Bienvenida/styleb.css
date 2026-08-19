@@ -1,0 +1,464 @@
+/* =========================================
+   RESET
+========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #061522;
+  color: white;
+}
+/* =========================================
+   ZONAS CLICKEABLES
+========================================= */
+.accesos {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+/* =========================================
+   CRONÓMETRO
+========================================= */
+.zona-cronometro {
+  left: 8.5%;
+  top: 44.5%;
+  width: 19.7%;
+  height: 32.5%;
+}
+/* =========================================
+   CONTROL
+========================================= */
+.zona-control {
+  left: 30.8%;
+  top: 44.5%;
+  width: 18.5%;
+  height: 32.5%;
+}
+/* =========================================
+   MARCADOR A
+========================================= */
+.zona-marcador-a {
+  left: 52.2%;
+  top: 44.5%;
+  width: 18.5%;
+  height: 32.5%;
+}
+/* =========================================
+   MARCADOR B
+========================================= */
+.zona-marcador-b {
+  left: 73.5%;
+  top: 44.5%;
+  width: 18.5%;
+  height: 32.5%;
+}
+/* =========================================
+   ENCABEZADO
+========================================= */
+.encabezado {
+  text-align: center;
+  margin-bottom: 45px;
+  position: relative;
+  z-index: 2;
+}
+.encabezado h1 {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 700;
+  letter-spacing: 8px;
+}
+.encabezado p {
+  margin-top: 10px;
+  font-size: clamp(12px, 1.5vw, 18px);
+  letter-spacing: 5px;
+  opacity: 0.75;
+}
+/* =========================================
+   TARJETA
+========================================= */
+.acceso {
+  background: rgba(5, 25, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 18px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+.acceso:hover {
+  transform: translateY(-4px);
+  background: rgba(8, 38, 58, 0.82);
+}
+/* =========================================
+   BOTÓN PRINCIPAL
+========================================= */
+.boton-acceso {
+  width: 100%;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: white;
+  border-radius: 14px;
+  background: rgba(0, 130, 190, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.2s ease;
+}
+.boton-acceso:hover {
+  background: rgba(0, 150, 220, 0.45);
+  transform: scale(1.02);
+}
+.boton-acceso:active {
+  transform: scale(0.98);
+}
+/* =========================================
+   ICONO
+========================================= */
+.icono {
+  font-size: 42px;
+}
+/* =========================================
+   NOMBRE
+========================================= */
+.nombre {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+/* =========================================
+   LINK + COPIAR
+========================================= */
+.fila-link {
+  display: flex;
+  width: 100%;
+  margin-top: 12px;
+  gap: 8px;
+}
+.fila-link input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.35);
+  color: white;
+  outline: none;
+  font-size: 13px;
+}
+.fila-link input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.fila-link input:focus {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+/* =========================================
+   BOTÓN COPIAR
+========================================= */
+.btnCopiar {
+  width: 46px;
+  height: 42px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+.btnCopiar:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+.btnCopiar.copiado {
+  background: rgba(20, 170, 90, 0.55);
+}
+/* =========================================
+   FOOTER
+========================================= */
+footer {
+  margin-top: 45px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  opacity: 0.45;
+  position: relative;
+  z-index: 2;
+}
+/* =========================================================
+   FONDO PRINCIPAL — PC
+========================================================= */
+.pantalla {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  background-image: url("../img/fondo-pc.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* =========================================================
+   TODAS LAS ZONAS CLICKEABLES
+========================================================= */
+.zona-clickeable {
+  position: absolute;
+  display: block;
+  /* background: transparent; */
+  cursor: pointer;
+  text-decoration: none;
+  height: auto;
+  aspect-ratio: 1 / 1; /* Fuerza forma de círculo perfecto */
+  border-radius: 50%;
+  /*
+    Evita que aparezca un resaltado extraño
+    en algunos dispositivos táctiles.
+  */
+  -webkit-tap-highlight-color: transparent;
+  background: rgba(255, 0, 0, 0.4) !important;
+  border: 2px solid red !important;
+}
+/* =========================================================
+   1. PC / DESKTOP (Horizontal)
+========================================================= */
+@media (min-width: 1025px) and (orientation: landscape) {
+  .pantalla {
+    background-image: url("../img/fondo-pc.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 11.2%;
+    top: 48%;
+    width: 14.5vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-control {
+    left: 32.8%;
+    top: 48%;
+    width: 14.5vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-a {
+    left: 54.1%;
+    top: 48%;
+    width: 14.5vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-b {
+    left: 75.3%;
+    top: 48%;
+    width: 14.5vw;
+    aspect-ratio: 1/1;
+  }
+}
+
+/* =========================================================
+   2. PC / MONITORES VERTICALES
+========================================================= */
+@media (min-width: 1025px) and (orientation: portrait) {
+  .pantalla {
+    background-image: url("../img/fondo-ipad.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 18%;
+    top: 46%;
+    width: 18vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-control {
+    left: 38%;
+    top: 46%;
+    width: 18vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-a {
+    left: 58%;
+    top: 46%;
+    width: 18vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-b {
+    left: 78%;
+    top: 46%;
+    width: 18vw;
+    aspect-ratio: 1/1;
+  }
+}
+
+/* =========================================================
+   3. TABLET / IPAD (Horizontal)
+========================================================= */
+@media (min-width: 700px) and (max-width: 1400px) and (orientation: landscape) {
+  .pantalla {
+    background-image: url("../img/fondo-ipad.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 21%;
+    top: 55%;
+    width: 13.8vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-control {
+    left: 41%;
+    top: 53%;
+    width: 13.8vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-a {
+    left: 62%;
+    top: 55%;
+    width: 13.8vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-b {
+    left: 81%;
+    top: 55%;
+    width: 13.8vw;
+    aspect-ratio: 1/1;
+  }
+}
+
+/* =========================================================
+   4. TABLET / IPAD (Vertical) - Como en tu captura
+========================================================= */
+@media (min-width: 601px) and (max-width: 1024px) and (orientation: portrait) {
+  .pantalla {
+    background-image: url("../img/fondo-ipad.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 20%;
+    top: 56%;
+    width: 17vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-control {
+    left: 38.8%;
+    top: 56%;
+    width: 17vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-a {
+    left: 60%;
+    top: 56%;
+    width: 17vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-b {
+    left: 80%;
+    top: 56%;
+    width: 17vw;
+    aspect-ratio: 1/1;
+  }
+}
+
+/* =========================================================
+   5. MOBILE (Horizontal)
+========================================================= */
+@media (max-width: 700px) and (orientation: landscape) {
+  .pantalla {
+    background-image: url("../img/fondo-pc.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 22%;
+    top: 55%;
+    width: 14vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-control {
+    left: 40%;
+    top: 55%;
+    width: 14vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-a {
+    left: 60%;
+    top: 55%;
+    width: 14vw;
+    aspect-ratio: 1/1;
+  }
+  .zona-marcador-b {
+    left: 80%;
+    top: 55%;
+    width: 14vw;
+    aspect-ratio: 1/1;
+  }
+}
+
+/* =========================================================
+   6. MOBILE (Vertical)
+========================================================= */
+@media (max-width: 700px) and (orientation: portrait) {
+  .pantalla {
+    background-image: url("../img/fondo-mobile.jpg");
+    background-size: 100% 100%;
+  }
+
+  .zona-cronometro {
+    left: 7%;
+    top: 37%;
+    width: 18w;
+  }
+  .zona-control {
+    left: 7.5%;
+    top: 52%;
+    width: 18vw;
+  }
+  .zona-marcador-a {
+    left: 7.5%;
+    top: 65%;
+    width: 18vw;
+  }
+  .zona-marcador-b {
+    left: 7.5%;
+    top: 80%;
+    width: 18vw;
+  }
+}
+/* =========================================================
+   PREVENIR SCROLL
+========================================================= */
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+/* =========================================================
+   SEGURIDAD PARA IPHONE / IPAD
+========================================================= */
+.pantalla {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
