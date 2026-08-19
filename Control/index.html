@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Control Waterpolo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!--=========================================
+    PANTALLA CONEXIÓN
+    ==========================================-->
+    <div id="pantallaConexion">
+      <div id="titulo">CONTROL REMOTO</div>
+      <input
+        id="codigo"
+        maxlength="3"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+      />
+      <button id="btnConectar">CONECTAR</button>
+    </div>
+    <!--=========================================
+    PANTALLA CONTROL
+    ==========================================-->
+    <div id="pantallaControl">
+      <div id="btnCronometro">PAUSAR</div>
+      <div id="marcador">
+        <button id="golAzul">GOL<br />AZUL</button>
+        <button id="golRojo">GOL<br />ROJO</button>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="control.js"></script>
+  </body>
+</html>

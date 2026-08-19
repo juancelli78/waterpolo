@@ -1,0 +1,113 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #111;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/*=========================================
+PANTALLA CONEXIÓN
+=========================================*/
+#pantallaConexion {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#titulo {
+  color: white;
+  font-size: 9vw;
+  font-weight: bold;
+  margin-bottom: 45px;
+}
+#codigo {
+  width: 45vw;
+  max-width: 220px;
+  height: 70px;
+  font-size: 16vw;
+  text-align: center;
+  text-transform: uppercase;
+}
+#btnConectar {
+  margin-top: 35px;
+  width: 60vw;
+  max-width: 260px;
+  height: 70px;
+  font-size: 1rem;
+}
+/*=========================================
+PANTALLA CONTROL
+=========================================*/
+#pantallaControl {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+/*=========================================
+BOTÓN CRONÓMETRO
+=========================================*/
+#btnCronometro {
+  width: 100%;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #d32f2f;
+  color: white;
+  font-size: 14vw;
+  font-weight: bold;
+  user-select: none;
+  touch-action: manipulation;
+}
+/*=========================================
+MARCADOR
+=========================================*/
+#marcador {
+  width: 100%;
+  height: 18%;
+  display: flex;
+}
+#golAzul {
+  flex: 1;
+  border: none;
+  background: #1565c0;
+  color: white;
+  font-size: 8vw;
+  font-weight: bold;
+}
+#golRojo {
+  flex: 1;
+  border: none;
+  background: #b71c1c;
+  color: white;
+  font-size: 8vw;
+  font-weight: bold;
+}
+
+/*=========================================
+MARCADOR
+=========================================*/
+button {
+  touch-action: manipulation;
+  outline: none;
+}
+
+/*=========================================
+PARA PC - LETRAS DEL CODIGO
+=========================================*/
+
+@media (min-width: 768px) {
+  #codigo {
+    font-size: 32px; /* Un tamaño moderado y proporcional para la PC */
+    width: 180px;
+  }
+}
