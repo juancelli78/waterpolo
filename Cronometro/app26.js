@@ -63,7 +63,43 @@ function dos(numero) {
   return "" + numero;
 }
 //=========================================
-// BUZZER EMBEBIDO - para que suene el buzzer en ios 9.0
+// BUZZER
+//=========================================
+// var buzzer = new Audio("Buzzer.mp3");
+// buzzer.preload = "auto";
+// //lo cambie 27.08.2026
+// function prepararBuzzer() {
+//   try {
+//     buzzer.load();
+//     buzzer.play();
+//     buzzer.pause();
+//     buzzer.currentTime = 0;
+//   } catch (e) {
+//     // Evita que un fallo de audio congele la app en iOS 9
+//   }
+// }
+
+// // function prepararBuzzer() {
+// //   buzzer.load();
+// //   // buzzer
+// //   //   .play()
+// //   //   .then(function () {
+// //   //     buzzer.pause(); // Lo reproducimos solamente un instante - para que Safari registre la interacción.
+// //   buzzer.currentTime = 0; // Lo dejamos nuevamente al principio.
+// //   // })
+// //   // .catch(function () {
+// //   // Si Safari bloquea la reproducción,
+// //   // no hacemos nada y evitamos que se rompa
+// //   // el resto de la aplicación.
+// //   // });
+// // }
+// function sonarBuzzer() {
+//   buzzer.currentTime = 0; // Comenzar siempre desde el principio.
+//   buzzer.play();
+// }
+
+//=========================================
+// BUZZER EMBEBIDO
 //=========================================
 
 var buzzer = new Audio(
@@ -88,6 +124,30 @@ function sonarBuzzer() {
     console.log("Error de buzzer:", e);
   }
 }
+
+// function prepararBuzzer() {
+//   try {
+//     buzzer.load();
+//   } catch (e) {
+//     // Evita que un fallo de audio congele la app en iOS 9
+//   }
+// }
+
+// function sonarBuzzer() {
+//   try {
+//     buzzer.currentTime = 0;
+
+//     var promesa = buzzer.play();
+
+//     if (promesa !== undefined) {
+//       promesa.catch(function (e) {
+//         console.log("Error reproduciendo buzzer:", e);
+//       });
+//     }
+//   } catch (e) {
+//     console.log("Error de buzzer:", e);
+//   }
+// }
 //=========================================
 // CODIGO => generar codigo.
 //=========================================
