@@ -1,0 +1,247 @@
+/******************************************
+FUENTES
+******************************************/
+@font-face {
+  font-family: "Bebas";
+  src: url("bebasneue-regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/******************************************
+GENERAL
+******************************************/
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  background-color: #031327;
+}
+
+/******************************************
+PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
+******************************************/
+#pantallaConfiguracion {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  /* Fondo degradado estilo profundidad marina */
+  background: radial-gradient(circle at 50% 20%, #0a2f52 0%, #031327 100%);
+  color: #ffffff;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#pantallaConfiguracion h1 {
+  margin: 10px 0 20px 0;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #00e5ff;
+  text-transform: uppercase;
+}
+
+.configContainer {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.columna {
+  width: 48%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.columna h2 {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #00e5ff;
+  letter-spacing: 1.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.fila label {
+  font-size: 20px;
+  color: #e0f7fa;
+  font-weight: 500;
+}
+
+.fila input {
+  width: 75px;
+  height: 48px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  border-radius: 8px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.fila input:focus {
+  border-color: #00e5ff;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/******************************************
+BOTÓN INICIAR
+******************************************/
+#btnIniciar {
+  display: block;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 400px;
+  height: 60px;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #031327;
+  background: #00e5ff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#btnIniciar:active {
+  background: #00b8d4;
+  transform: scale(0.98);
+}
+
+/******************************************
+CÓDIGO DE CONEXIÓN
+******************************************/
+#codigoPartido {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-family: monospace, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: #00e5ff;
+  opacity: 0.8;
+  background: rgba(0, 229, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  pointer-events: none;
+}
+
+/******************************************
+PANTALLA CRONÓMETRO
+******************************************/
+#pantallaCronometro {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: #000000;
+  color: #ffffff;
+}
+
+#periodo {
+  position: absolute;
+  top: 12px;
+  width: 100%;
+  text-align: center;
+  color: #00e5ff;
+  font-size: 28px;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+
+#estado {
+  position: absolute;
+  bottom: 12px;
+  width: 100%;
+  text-align: center;
+  color: #888888;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+#cronometro {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  line-height: 0.72;
+  overflow: visible;
+  font-family: "Bebas", Arial, sans-serif;
+  letter-spacing: 0.5rem;
+}
+
+#mm,
+#ss {
+  font-family: "Bebas", Arial, sans-serif;
+  font-size: 48vw;
+  font-weight: 400;
+  line-height: 0.72;
+}
+
+#dp {
+  font-family: "Bebas", Arial, sans-serif;
+  font-size: 48vw;
+  font-weight: 400;
+  line-height: 0.72;
+  position: relative;
+  top: -0.08em;
+}
+
+/******************************************
+ESTADOS DE COLOR CRONÓMETRO
+******************************************/
+.rojo {
+  color: #ff3366 !important;
+}
+
+.descanso {
+  color: #00e5ff !important;
+}
+
+.fin {
+  color: #00ff88 !important;
+}
