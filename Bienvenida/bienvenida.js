@@ -16,3 +16,25 @@ document.querySelector(".zona-cronometro").href = links.cronometro || "#";
 document.querySelector(".zona-control").href = links.control || "#";
 document.querySelector(".zona-marcador-a").href = links.marcadorA || "#";
 document.querySelector(".zona-marcador-b").href = links.marcadorB || "#";
+
+
+/* =========================================
+   VIDEOS EN VERTICAL O HORIZONTAL
+========================================= */
+function actualizarVideo() {
+  var video = document.getElementById("videoFondo");
+
+  if (window.innerWidth > window.innerHeight) {
+    video.src = "VideosBienvenida/1_web.mp4";
+  } else {
+    video.src = "VideosBienvenida/2_web.mp4";
+  }
+
+  video.load();
+
+  video.play();
+}
+
+actualizarVideo();
+
+window.addEventListener("resize", actualizarVideo);
