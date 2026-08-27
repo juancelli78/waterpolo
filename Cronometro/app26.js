@@ -78,6 +78,21 @@ function prepararBuzzer() {
     // Evita que un fallo de audio congele la app en iOS 9
   }
 }
+
+// function prepararBuzzer() {
+//   buzzer.load();
+//   // buzzer
+//   //   .play()
+//   //   .then(function () {
+//   //     buzzer.pause(); // Lo reproducimos solamente un instante - para que Safari registre la interacción.
+//   buzzer.currentTime = 0; // Lo dejamos nuevamente al principio.
+//   // })
+//   // .catch(function () {
+//   // Si Safari bloquea la reproducción,
+//   // no hacemos nada y evitamos que se rompa
+//   // el resto de la aplicación.
+//   // });
+// }
 function sonarBuzzer() {
   buzzer.currentTime = 0; // Comenzar siempre desde el principio.
   buzzer.play();
@@ -155,6 +170,50 @@ function comenzarPartido() {
   estado.innerHTML = "ESPERANDO AL CONTROL....";
   prepararBuzzer();
   actualizarPantalla();
+  notificarCambioPantalla(3);
+
+  // --- AGREGAR A PARTIR DE ACÁ ---
+  // AGREGUE PARA TRABAR REANUDR.
+  if (socketSupabase && socketSupabase.readyState == 1) {
+    var mensajeInicio = {
+      topic: "realtime:partido:" + codigo,
+      event: "broadcast",
+      payload: {
+        type: "broadcast",
+        event: "comando",
+        payload: {
+          comando: "pantalla_partido"
+        }
+      },
+      ref: "pantalla_ref"
+    };
+    socketSupabase.send(JSON.stringify(mensajeInicio));
+  }
+}
+
+function notificarCambioPantalla(intentosRestantes) {
+  if (socketSupabase && socketSupabase.readyState === 1) {
+    var mensajeInicio = {
+      topic: "realtime:partido:" + codigo,
+      event: "broadcast",
+      payload: {
+        type: "broadcast",
+        event: "comando",
+        payload: {
+          comando: "pantalla_partido"
+        }
+      },
+      ref: "pantalla_ref"
+    };
+    socketSupabase.send(JSON.stringify(mensajeInicio));
+  }
+
+  // Si quedan intentos, vuelve a transmitir cada 400ms para asegurar la recepción
+  if (intentosRestantes > 0) {
+    setTimeout(function () {
+      notificarCambioPantalla(intentosRestantes - 1);
+    }, 400);
+  }
 }
 //=========================================
 // BOTÓN INICIAR
@@ -283,7 +342,25 @@ function loop() {
 //=========================================
 // EVENTOS => el verdadero problema. Los cambie por esto
 //=========================================
-pantallaCronometro.onclick = iniciarPausar;
+// pantallaCronometro.onclick = iniciarPausar; // lo modifique 27.08.2026  - y despues lo modifique por activarInteraccion.
+// Reemplaza pantallaCronometro.onclick = iniciarPausar; por:
+
+function activarInteraccion(elemento, funcion) {
+  elemento.addEventListener(
+    "touchend",
+    function (e) {
+      e.preventDefault();
+      funcion();
+    },
+    false
+  );
+
+  elemento.onclick = funcion;
+}
+
+// Aplicar a los botones
+activarInteraccion(botonIniciar, comenzarPartido);
+activarInteraccion(pantallaCronometro, iniciarPausar);
 //=========================================
 // INICIALIZACIÓN
 //=========================================
@@ -511,6 +588,7 @@ function conectarSupabase() {
       socketSupabase.send(JSON.stringify(mensaje));
       iniciarHeartbeat();
     };
+
     socketSupabase.onmessage = function (evento) {
       var mensaje;
       try {
@@ -518,6 +596,7 @@ function conectarSupabase() {
       } catch (e) {
         return;
       }
+
       if (
         mensaje.event == "phx_reply" &&
         mensaje.payload &&
@@ -525,14 +604,18 @@ function conectarSupabase() {
       ) {
         return;
       }
+
       if (
         mensaje.event == "broadcast" &&
         mensaje.payload &&
         mensaje.payload.payload
       ) {
         var comando = mensaje.payload.payload.comando;
-        // 1. SOLICITUD DE VERIFICACIÓN
-        if (comando == "verificar") {
+
+        // 1. SOLICITUD DE VERIFICACIÓN / CONSULTA DE PANTALLA
+        if (comando == "verificar" || comando == "consultar_estado") {
+          var enPantallaPartido = pantallaCronometro.style.display === "block";
+
           var respuesta = {
             topic: "realtime:partido:" + codigo,
             event: "broadcast",
@@ -541,7 +624,10 @@ function conectarSupabase() {
               event: "respuesta",
               payload: {
                 respuesta: "codigo_ok",
-                codigo: codigo // 👈 AQUÍ SE ENVÍA EL CÓDIGO REAL DEL IPAD
+                codigo: codigo,
+                pantallaActual: enPantallaPartido
+                  ? "pantalla_partido"
+                  : "configuracion"
               }
             },
             ref: "3"
@@ -549,37 +635,41 @@ function conectarSupabase() {
           socketSupabase.send(JSON.stringify(respuesta));
           return;
         }
+
         // 2. PAUSAR
         if (comando == "pausar") {
           corriendo = false;
           estado.innerHTML = "PAUSADO DESDE CONTROL";
           return;
         }
-        // 3. REANUDAR (INICIA / CONTINÚA EL PARTIDO)
+
+        // 3. REANUDAR
         if (comando == "reanudar") {
           corriendo = true;
           ultimoTick = Date.now();
           estado.innerHTML = "EN JUEGO";
           return;
         }
-      }
-      // 4. GOL AZUL
-      if (comando == "golAzul") {
-        golesAzul++;
-        corriendo = false; // Pausa el cronómetro al haber un gol
-        estado.innerHTML = "¡GOL AZUL!";
-        if (divGolAzul) divGolAzul.innerHTML = golesAzul;
-        return;
-      }
-      // 5. GOL ROJO
-      if (comando == "golRojo") {
-        golesRojo++;
-        corriendo = false; // Pausa el cronómetro al haber un gol
-        estado.innerHTML = "¡GOL ROJO!";
-        if (divGolRojo) divGolRojo.innerHTML = golesRojo;
-        return;
+
+        // 4. GOLES
+        if (comando == "golAzul") {
+          golesAzul++;
+          corriendo = false;
+          estado.innerHTML = "¡GOL AZUL!";
+          if (divGolAzul) divGolAzul.innerHTML = golesAzul;
+          return;
+        }
+
+        if (comando == "golRojo") {
+          golesRojo++;
+          corriendo = false;
+          estado.innerHTML = "¡GOL ROJO!";
+          if (divGolRojo) divGolRojo.innerHTML = golesRojo;
+          return;
+        }
       }
     };
+
     socketSupabase.onerror = function () {};
     socketSupabase.onclose = function () {
       supabaseConectado = false;
