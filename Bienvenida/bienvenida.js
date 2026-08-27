@@ -25,9 +25,9 @@ function actualizarVideo() {
   var video = document.getElementById("videoFondo");
 
   if (window.innerWidth > window.innerHeight) {
-    video.src = "VideosBienvenida/1_web.mp4";
+    video.src = "VideosBienvenida/1ios.mp4";
   } else {
-    video.src = "VideosBienvenida/2_web.mp4";
+    video.src = "VideosBienvenida/2ios.mp4";
   }
 
   video.load();
@@ -38,3 +38,4 @@ function actualizarVideo() {
 actualizarVideo();
 
 window.addEventListener("resize", actualizarVideo);
+
