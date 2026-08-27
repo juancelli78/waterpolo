@@ -13,7 +13,6 @@ GENERAL
 ******************************************/
 * {
   box-sizing: border-box;
-  -webkit-box-sizing: border-box;
 }
 
 html,
@@ -26,13 +25,15 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  font-family: Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
   background-color: #031327;
 }
 
 /******************************************
-PANTALLA CONFIGURACIÓN (COMPATIBLE iOS 9)
+PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
 ******************************************/
 #pantallaConfiguracion {
   position: absolute;
@@ -40,76 +41,84 @@ PANTALLA CONFIGURACIÓN (COMPATIBLE iOS 9)
   top: 0;
   width: 100%;
   height: 100%;
-  /* Gradient compatible con prefijo webkit antiguo */
-  background: #031327;
-  background: -webkit-radial-gradient(center, circle cover, #0a2f52 0%, #031327 100%);
+  /* Fondo degradado estilo profundidad marina */
+  background: radial-gradient(circle at 50% 20%, #0a2f52 0%, #031327 100%);
   color: #ffffff;
-  padding: 20px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #pantallaConfiguracion h1 {
   margin: 10px 0 20px 0;
   text-align: center;
   font-size: 32px;
-  font-weight: bold;
+  font-weight: 700;
+  letter-spacing: 3px;
   color: #00e5ff;
+  text-transform: uppercase;
 }
 
 .configContainer {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  /* Flexbox estilo antiguo (iOS 9) */
-  display: -webkit-flex;
+  max-width: 900px;
   display: flex;
-  -webkit-justify-content: space-between;
   justify-content: space-between;
+  gap: 20px;
 }
 
 .columna {
   width: 48%;
-  background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px;
 }
 
 .columna h2 {
   text-align: center;
-  margin: 0 0 15px 0;
+  margin: 0 0 20px 0;
   font-size: 22px;
+  font-weight: 600;
   color: #00e5ff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding-bottom: 8px;
+  letter-spacing: 1.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
 }
 
 .fila {
-  display: -webkit-flex;
   display: flex;
-  -webkit-justify-content: space-between;
   justify-content: space-between;
-  -webkit-align-items: center;
   align-items: center;
-  margin: 12px 0;
+  margin: 15px 0;
 }
 
 .fila label {
   font-size: 20px;
   color: #e0f7fa;
+  font-weight: 500;
 }
 
 .fila input {
-  width: 70px;
-  height: 45px;
-  font-size: 22px;
+  width: 75px;
+  height: 48px;
+  font-size: 24px;
   font-weight: bold;
   text-align: center;
   color: #ffffff;
-  background-color: #0d3b66;
-  border: 1px solid #00e5ff;
-  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  border-radius: 8px;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
+}
+
+.fila input:focus {
+  border-color: #00e5ff;
+  background-color: rgba(255, 255, 255, 0.18);
 }
 
 /******************************************
@@ -117,17 +126,26 @@ BOTÓN INICIAR
 ******************************************/
 #btnIniciar {
   display: block;
-  margin: 25px auto 0 auto;
-  width: 320px;
-  height: 55px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 400px;
+  height: 60px;
   font-size: 22px;
   font-weight: bold;
+  letter-spacing: 2px;
   color: #031327;
-  background-color: #00e5ff;
+  background: #00e5ff;
   border: none;
-  border-radius: 28px;
+  border-radius: 30px;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
   -webkit-appearance: none;
+  appearance: none;
+}
+
+#btnIniciar:active {
+  background: #00b8d4;
+  transform: scale(0.98);
 }
 
 /******************************************
@@ -141,10 +159,11 @@ CÓDIGO DE CONEXIÓN
   font-size: 18px;
   font-weight: bold;
   color: #00e5ff;
-  background-color: rgba(0, 229, 255, 0.15);
-  padding: 5px 10px;
-  border-radius: 5px;
-  border: 1px solid rgba(0, 229, 255, 0.3);
+  opacity: 0.8;
+  background: rgba(0, 229, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
   pointer-events: none;
 }
 
@@ -158,7 +177,7 @@ PANTALLA CRONÓMETRO
   width: 100%;
   height: 100%;
   display: none;
-  background-color: #000000;
+  background: #000000;
   color: #ffffff;
 }
 
@@ -169,6 +188,7 @@ PANTALLA CRONÓMETRO
   text-align: center;
   color: #00e5ff;
   font-size: 28px;
+  letter-spacing: 3px;
   font-weight: bold;
 }
 
@@ -179,38 +199,40 @@ PANTALLA CRONÓMETRO
   text-align: center;
   color: #888888;
   font-size: 18px;
+  letter-spacing: 1px;
 }
 
 #cronometro {
   position: absolute;
   left: 50%;
   top: 55%;
-  -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   white-space: nowrap;
   line-height: 0.72;
+  overflow: visible;
   font-family: "Bebas", Arial, sans-serif;
+  letter-spacing: 0.5rem;
 }
 
 #mm,
 #ss {
   font-family: "Bebas", Arial, sans-serif;
   font-size: 48vw;
-  font-weight: normal;
+  font-weight: 400;
   line-height: 0.72;
 }
 
 #dp {
   font-family: "Bebas", Arial, sans-serif;
   font-size: 48vw;
-  font-weight: normal;
+  font-weight: 400;
   line-height: 0.72;
   position: relative;
   top: -0.08em;
 }
 
 /******************************************
-COLORES DEL CRONÓMETRO
+ESTADOS DE COLOR CRONÓMETRO
 ******************************************/
 .rojo {
   color: #ff3366 !important;
