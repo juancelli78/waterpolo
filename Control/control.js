@@ -1,6 +1,11 @@
-//=========================================
-// VARIABLES
-//=========================================
+//======================================================
+// CONTROL - WATERPOLO
+// Compatible con iOS 9 / Safari antiguo
+// Supabase Realtime por WebSocket
+//======================================================
+//======================================================
+// ELEMENTOS HTML
+//======================================================
 var pantallaConexion = document.getElementById("pantallaConexion");
 var pantallaControl = document.getElementById("pantallaControl");
 var codigo = document.getElementById("codigo");
@@ -8,68 +13,368 @@ var btnConectar = document.getElementById("btnConectar");
 var btnCronometro = document.getElementById("btnCronometro");
 var golAzul = document.getElementById("golAzul");
 var golRojo = document.getElementById("golRojo");
+//======================================================
+// VARIABLES GENERALES
+//======================================================
 var codigoPartido = "";
 var pausado = false;
 var bloqueado = false;
 var codigoVerificado = false;
 var verificacionTimer = null;
-//=========================================
+//======================================================
 // SUPABASE
-//=========================================
-var heartbeatTimer = null;
-var socketSupabase = null;
-var supabaseConectado = false;
+//======================================================
 var SUPABASE_URL =
   "wss://ggxizsrunwmzznnuaufg.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdneGl6c3J1bndtenpubnVhdWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MDE0NzMsImV4cCI6MjEwMTQ3NzQ3M30.YBDJTHR-RcckirDpUdA63OfFA9JT571tPLxSAAoRSuc&vsn=1.0.0";
-//=========================================
+//======================================================
+// CONEXIÓN PRINCIPAL - CRONÓMETRO
+//======================================================
+var socketSupabase = null;
+var supabaseConectado = false;
+var conectandoSupabase = false;
+var heartbeatTimer = null;
+var heartbeatTimeout = null;
+var heartbeatNumero = 0;
+var reconnectTimer = null;
+//======================================================
+// CONEXIÓN INDEPENDIENTE - MARCADOR
+//======================================================
+var socketMarcador = null;
+var marcadorConectado = false;
+var conectandoMarcador = false;
+var heartbeatMarcadorTimer = null;
+var heartbeatMarcadorTimeout = null;
+var heartbeatMarcadorNumero = 0;
+var reconnectMarcadorTimer = null;
+var golPendiente = null;
+//======================================================
 // EVITAR DOBLE TOQUE
-//=========================================
+//======================================================
 function ejecutarAccion(fn) {
-  if (bloqueado) return;
+  if (bloqueado) {
+    return;
+  }
   bloqueado = true;
   fn();
   setTimeout(function () {
     bloqueado = false;
   }, 200);
 }
-// =========================================
-// 1. DESHABILITAR Y BLOQUEAR EL BOTÓN "ATRÁS" - PARA EVITAR ERRORES.
-// =========================================
-// Insertamos un estado falso en el historial del navegador
+//======================================================
+// BLOQUEAR BOTÓN ATRÁS
+//======================================================
 history.pushState(null, null, location.href);
-
 window.onpopstate = function () {
-  // Cada vez que intente ir atrás, lo volvemos a empujar al estado actual
   history.pushState(null, null, location.href);
-
-  // Opcional: Podés avisarle al usuario
   alert("El botón 'Atrás' está desactivado durante el control del partido.");
 };
-
-// =========================================
-// 2. BLOQUEAR LA "X", RECARGA O SALIDA ACCIDENTAL - PARA EVITAR ERRORES.
-// =========================================
+//======================================================
+// BLOQUEAR SALIDA / RECARGA
+//======================================================
 window.addEventListener("beforeunload", function (e) {
-  // Si ya se verificó el código y está en el control, mostramos confirmación
-  if (typeof codigoVerificado !== "undefined" && codigoVerificado) {
-    // Cancelar el evento según el estándar de los navegadores
+  if (codigoVerificado) {
     e.preventDefault();
-
-    // Para compatibilidad con navegadores viejos (iOS/Android)
     e.returnValue =
       "Se perderá la conexión con el cronómetro. ¿Seguro que querés salir?";
     return e.returnValue;
   }
 });
-
-//=========================================
-// ENVIAR COMANDO
-//=========================================
-//=========================================
-// ENVIAR COMANDO DE TIEMPO - CRONOMETRO - POR SUPABASE
-//=========================================
+//======================================================
+// HEARTBEAT - CRONÓMETRO
+//======================================================
+function iniciarHeartbeat() {
+  detenerHeartbeat();
+  heartbeatTimer = setInterval(function () {
+    if (
+      socketSupabase &&
+      socketSupabase.readyState === WebSocket.OPEN &&
+      supabaseConectado
+    ) {
+      heartbeatNumero++;
+      var refHeartbeat = "hb_" + heartbeatNumero;
+      var mensaje = {
+        topic: "phoenix",
+        event: "heartbeat",
+        payload: {},
+        ref: refHeartbeat
+      };
+      try {
+        socketSupabase.send(JSON.stringify(mensaje));
+        if (heartbeatTimeout) {
+          clearTimeout(heartbeatTimeout);
+        }
+        heartbeatTimeout = setTimeout(function () {
+          // No llegó respuesta al heartbeat.
+          // Consideramos que la conexión murió.
+          if (socketSupabase && socketSupabase.readyState === WebSocket.OPEN) {
+            try {
+              socketSupabase.close();
+            } catch (e) {}
+          }
+        }, 10000);
+      } catch (e) {
+        try {
+          socketSupabase.close();
+        } catch (err) {}
+      }
+    }
+  }, 20000);
+}
+//======================================================
+// DETENER HEARTBEAT - CRONÓMETRO
+//======================================================
+function detenerHeartbeat() {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null;
+  }
+  if (heartbeatTimeout) {
+    clearTimeout(heartbeatTimeout);
+    heartbeatTimeout = null;
+  }
+}
+//======================================================
+// PROGRAMAR RECONEXIÓN - CRONÓMETRO
+//======================================================
+function programarReconectar() {
+  if (reconnectTimer) {
+    return;
+  }
+  if (!codigoPartido) {
+    return;
+  }
+  reconnectTimer = setTimeout(function () {
+    reconnectTimer = null;
+    conectarSupabase();
+  }, 3000);
+}
+//======================================================
+// CONECTAR CON SUPABASE - CRONÓMETRO
+//======================================================
+function conectarSupabase() {
+  if (!codigoPartido) {
+    return;
+  }
+  if (conectandoSupabase) {
+    return;
+  }
+  if (socketSupabase && socketSupabase.readyState === WebSocket.OPEN) {
+    return;
+  }
+  conectandoSupabase = true;
+  var socket = null;
+  try {
+    socket = new WebSocket(SUPABASE_URL);
+    socketSupabase = socket;
+  } catch (e) {
+    conectandoSupabase = false;
+    programarReconectar();
+    return;
+  }
+  //====================================================
+  // SOCKET ABIERTO
+  //====================================================
+  socket.onopen = function () {
+    if (socket !== socketSupabase) {
+      return;
+    }
+    conectandoSupabase = false;
+    var mensaje = {
+      topic: "realtime:partido:" + codigoPartido,
+      event: "phx_join",
+      payload: {
+        config: {
+          broadcast: {
+            ack: false,
+            self: true
+          },
+          presence: {
+            enabled: false
+          },
+          postgres_changes: []
+        }
+      },
+      ref: "join_1",
+      join_ref: "join_1"
+    };
+    try {
+      socket.send(JSON.stringify(mensaje));
+    } catch (e) {
+      try {
+        socket.close();
+      } catch (err) {}
+    }
+  };
+  //====================================================
+  // MENSAJES
+  //====================================================
+  socket.onmessage = function (evento) {
+    if (socket !== socketSupabase) {
+      return;
+    }
+    var respuesta;
+    try {
+      respuesta = JSON.parse(evento.data);
+    } catch (e) {
+      return;
+    }
+    //==================================================
+    // RESPUESTA DEL HEARTBEAT
+    //==================================================
+    if (
+      respuesta.event == "phx_reply" &&
+      respuesta.ref &&
+      String(respuesta.ref).indexOf("hb_") === 0
+    ) {
+      if (heartbeatTimeout) {
+        clearTimeout(heartbeatTimeout);
+        heartbeatTimeout = null;
+      }
+      return;
+    }
+    //==================================================
+    // SUPABASE ACEPTÓ EL CANAL
+    //==================================================
+    if (
+      respuesta.event == "phx_reply" &&
+      respuesta.payload &&
+      respuesta.payload.status == "ok"
+    ) {
+      supabaseConectado = true;
+      iniciarHeartbeat();
+      enviarVerificacion();
+      return;
+    }
+    //==================================================
+    // RESPUESTA DEL CRONÓMETRO / IPAD
+    //==================================================
+    if (
+      respuesta.event == "broadcast" &&
+      respuesta.payload &&
+      respuesta.payload.payload
+    ) {
+      var payloadData = respuesta.payload.payload;
+      // Ignorar nuestro propio "verificar"
+      if (payloadData.comando === "verificar") {
+        return;
+      }
+      //================================================
+      // VALIDAR RESPUESTA DEL IPAD
+      //================================================
+      if (
+        payloadData.event === "respuesta" ||
+        payloadData.respuesta === "codigo_ok" ||
+        payloadData.codigo
+      ) {
+        var codigoDelIPad = payloadData.codigo || payloadData.respuesta;
+        var ipadLimpio = String(codigoDelIPad).trim().toUpperCase();
+        var celuLimpio = String(codigoPartido).trim().toUpperCase();
+        if (
+          ipadLimpio === celuLimpio ||
+          payloadData.respuesta === "codigo_ok"
+        ) {
+          codigoVerificado = true;
+          if (verificacionTimer) {
+            clearTimeout(verificacionTimer);
+            verificacionTimer = null;
+          }
+          // Solo mostrar el mensaje la primera vez.
+          if (pantallaConexion.style.display !== "none") {
+            alert("CONECTADO CON ÉXITO");
+          }
+          pantallaConexion.style.display = "none";
+          pantallaControl.style.display = "block";
+          // El cronómetro empieza pausado.
+          pausado = true;
+          btnCronometro.innerHTML = "INICIAR / REANUDAR";
+          btnCronometro.style.background = "#2e7d32";
+        }
+      }
+    }
+  };
+  //====================================================
+  // ERROR
+  //====================================================
+  socket.onerror = function () {
+    if (socket !== socketSupabase) {
+      return;
+    }
+    supabaseConectado = false;
+  };
+  //====================================================
+  // CIERRE
+  //====================================================
+  socket.onclose = function () {
+    if (socket !== socketSupabase) {
+      return;
+    }
+    supabaseConectado = false;
+    conectandoSupabase = false;
+    detenerHeartbeat();
+    // Si todavía no validamos el código,
+    // no reconectar automáticamente.
+    if (!codigoVerificado) {
+      return;
+    }
+    // Si ya estábamos controlando el partido,
+    // reconectar automáticamente.
+    programarReconectar();
+  };
+}
+//======================================================
+// ENVIAR VERIFICACIÓN DE CÓDIGO
+//======================================================
+function enviarVerificacion() {
+  if (!socketSupabase || socketSupabase.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  var mensaje = {
+    topic: "realtime:partido:" + codigoPartido,
+    event: "broadcast",
+    payload: {
+      type: "broadcast",
+      event: "comando",
+      payload: {
+        comando: "verificar"
+      }
+    },
+    ref: "verificar"
+  };
+  try {
+    socketSupabase.send(JSON.stringify(mensaje));
+  } catch (e) {
+    return;
+  }
+  // Solo iniciar temporizador si todavía
+  // no verificamos el código.
+  if (!codigoVerificado) {
+    if (verificacionTimer) {
+      clearTimeout(verificacionTimer);
+    }
+    verificacionTimer = setTimeout(function () {
+      if (!codigoVerificado) {
+        alert("CÓDIGO INCORRECTO");
+        try {
+          if (socketSupabase) {
+            socketSupabase.close();
+          }
+        } catch (e) {}
+        btnConectar.disabled = false;
+        btnConectar.innerHTML = "CONECTAR";
+        supabaseConectado = false;
+      }
+    }, 10000);
+  }
+}
+//======================================================
+// ENVIAR COMANDO AL CRONÓMETRO
+//======================================================
 function enviarComando(comando) {
-  if (!supabaseConectado) {
+  if (
+    !supabaseConectado ||
+    !socketSupabase ||
+    socketSupabase.readyState !== WebSocket.OPEN
+  ) {
     alert("SUPABASE NO CONECTADO");
     return;
   }
@@ -80,370 +385,287 @@ function enviarComando(comando) {
       type: "broadcast",
       event: "comando",
       payload: {
-        comando: comando,
-      },
+        comando: comando
+      }
     },
-    ref: "2",
+    ref: "comando"
   };
-  socketSupabase.send(JSON.stringify(mensaje));
+  try {
+    socketSupabase.send(JSON.stringify(mensaje));
+  } catch (e) {
+    supabaseConectado = false;
+    try {
+      socketSupabase.close();
+    } catch (err) {}
+  }
 }
-//=========================================
-// 2. ENVIAR COMANDO DE GOL (Marcadores Independientes) - POR SUPABASE
-//=========================================
-//=========================================
-// CONTROL DE MARCADORES (INDEPENDIENTE)
-//=========================================
-var socketMarcador = null;
-var heartbeatMarcadorTimer = null;
-
-// Mantener viva la compuerta del marcador (Ping cada 30 segundos)
+//======================================================
+// HEARTBEAT - MARCADOR
+//======================================================
 function iniciarHeartbeatMarcador() {
-  if (heartbeatMarcadorTimer) clearInterval(heartbeatMarcadorTimer);
-
+  detenerHeartbeatMarcador();
   heartbeatMarcadorTimer = setInterval(function () {
-    if (socketMarcador && socketMarcador.readyState === WebSocket.OPEN) {
-      var ping = {
+    if (
+      socketMarcador &&
+      socketMarcador.readyState === WebSocket.OPEN &&
+      marcadorConectado
+    ) {
+      heartbeatMarcadorNumero++;
+      var refHeartbeat = "hb_m_" + heartbeatMarcadorNumero;
+      var mensaje = {
         topic: "phoenix",
         event: "heartbeat",
         payload: {},
-        ref: "heartbeat_marcador",
+        ref: refHeartbeat
       };
-      socketMarcador.send(JSON.stringify(ping));
+      try {
+        socketMarcador.send(JSON.stringify(mensaje));
+        if (heartbeatMarcadorTimeout) {
+          clearTimeout(heartbeatMarcadorTimeout);
+        }
+        heartbeatMarcadorTimeout = setTimeout(function () {
+          if (socketMarcador && socketMarcador.readyState === WebSocket.OPEN) {
+            try {
+              socketMarcador.close();
+            } catch (e) {}
+          }
+        }, 10000);
+      } catch (e) {
+        try {
+          socketMarcador.close();
+        } catch (err) {}
+      }
     }
-  }, 30000);
+  }, 20000);
 }
-
+//======================================================
+// DETENER HEARTBEAT - MARCADOR
+//======================================================
 function detenerHeartbeatMarcador() {
   if (heartbeatMarcadorTimer) {
     clearInterval(heartbeatMarcadorTimer);
     heartbeatMarcadorTimer = null;
   }
-}
-
-//=========================================
-// ENVIAR COMANDO DE GOL
-//=========================================
-function enviarComandoGol(comando) {
-  var SUPABASE_URL =
-    "wss://ggxizsrunwmzznnuaufg.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdneGl6c3J1bndtenpubnVhdWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MDE0NzMsImV4cCI6MjEwMTQ3NzQ3M30.YBDJTHR-RcckirDpUdA63OfFA9JT571tPLxSAAoRSuc&vsn=1.0.0";
-
-  // Transmitir paquete al marcador
-  function transmitirGol() {
-    try {
-      var mensaje = {
-        topic: "realtime:partido:marcador",
-        event: "broadcast",
-        payload: {
-          type: "broadcast",
-          event: "comando",
-          payload: {
-            comando: comando,
-          },
-        },
-        ref: "gol_ref",
-      };
-      socketMarcador.send(JSON.stringify(mensaje));
-    } catch (err) {}
+  if (heartbeatMarcadorTimeout) {
+    clearTimeout(heartbeatMarcadorTimeout);
+    heartbeatMarcadorTimeout = null;
   }
-
-  // 1. Si la compuerta ya está abierta, envía directamente
-  if (socketMarcador && socketMarcador.readyState === WebSocket.OPEN) {
-    transmitirGol();
+}
+//======================================================
+// RECONEXIÓN - MARCADOR
+//======================================================
+function programarReconectarMarcador() {
+  if (reconnectMarcadorTimer) {
     return;
   }
-
-  // 2. Si no está conectada, abre la compuerta, activa el heartbeat y transmite
-  try {
-    socketMarcador = new WebSocket(SUPABASE_URL);
-
-    socketMarcador.onopen = function () {
-      var joinMsg = {
-        topic: "realtime:partido:marcador",
-        event: "phx_join",
-        payload: {
-          config: {
-            broadcast: { ack: false, self: true },
-            presence: { enabled: false },
-            postgres_changes: [],
-          },
-        },
-        ref: "join_gol",
-        join_ref: "join_gol",
-      };
-
-      socketMarcador.send(JSON.stringify(joinMsg));
-
-      // Inicia los latidos de mantenimiento para evitar el cierre por inactividad
-      iniciarHeartbeatMarcador();
-
-      // Transmite el gol 150ms después de unirse al canal
-      setTimeout(function () {
-        transmitirGol();
-      }, 150);
-    };
-
-    socketMarcador.onclose = function () {
-      detenerHeartbeatMarcador();
-    };
-
-    socketMarcador.onerror = function () {
-      detenerHeartbeatMarcador();
-    };
-  } catch (e) {}
+  reconnectMarcadorTimer = setTimeout(function () {
+    reconnectMarcadorTimer = null;
+    conectarMarcador();
+  }, 3000);
 }
-
-//=========================================
-// ENVIAR VERIFICACION DE CODIGO
-//=========================================
-function enviarVerificacion() {
+//======================================================
+// CONECTAR MARCADOR
+//======================================================
+function conectarMarcador() {
+  if (conectandoMarcador) {
+    return;
+  }
+  if (socketMarcador && socketMarcador.readyState === WebSocket.OPEN) {
+    return;
+  }
+  conectandoMarcador = true;
+  var socket = null;
+  try {
+    socket = new WebSocket(SUPABASE_URL);
+    socketMarcador = socket;
+  } catch (e) {
+    conectandoMarcador = false;
+    programarReconectarMarcador();
+    return;
+  }
+  //====================================================
+  // MARCADOR - OPEN
+  //====================================================
+  socket.onopen = function () {
+    if (socket !== socketMarcador) {
+      return;
+    }
+    conectandoMarcador = false;
+    var mensaje = {
+      topic: "realtime:partido:marcador",
+      event: "phx_join",
+      payload: {
+        config: {
+          broadcast: {
+            ack: false,
+            self: true
+          },
+          presence: {
+            enabled: false
+          },
+          postgres_changes: []
+        }
+      },
+      ref: "join_marcador",
+      join_ref: "join_marcador"
+    };
+    try {
+      socket.send(JSON.stringify(mensaje));
+    } catch (e) {
+      try {
+        socket.close();
+      } catch (err) {}
+    }
+  };
+  //====================================================
+  // MARCADOR - MESSAGE
+  //====================================================
+  socket.onmessage = function (evento) {
+    if (socket !== socketMarcador) {
+      return;
+    }
+    var respuesta;
+    try {
+      respuesta = JSON.parse(evento.data);
+    } catch (e) {
+      return;
+    }
+    //==================================================
+    // HEARTBEAT
+    //==================================================
+    if (
+      respuesta.event == "phx_reply" &&
+      respuesta.ref &&
+      String(respuesta.ref).indexOf("hb_m_") === 0
+    ) {
+      if (heartbeatMarcadorTimeout) {
+        clearTimeout(heartbeatMarcadorTimeout);
+        heartbeatMarcadorTimeout = null;
+      }
+      return;
+    }
+    //==================================================
+    // CANAL ACEPTADO
+    //==================================================
+    if (
+      respuesta.event == "phx_reply" &&
+      respuesta.payload &&
+      respuesta.payload.status == "ok"
+    ) {
+      marcadorConectado = true;
+      iniciarHeartbeatMarcador();
+      // Si había un gol esperando,
+      // enviarlo ahora.
+      if (golPendiente) {
+        transmitirGol(golPendiente);
+        golPendiente = null;
+      }
+    }
+  };
+  //====================================================
+  // MARCADOR - ERROR
+  //====================================================
+  socket.onerror = function () {
+    if (socket !== socketMarcador) {
+      return;
+    }
+    marcadorConectado = false;
+  };
+  //====================================================
+  // MARCADOR - CLOSE
+  //====================================================
+  socket.onclose = function () {
+    if (socket !== socketMarcador) {
+      return;
+    }
+    marcadorConectado = false;
+    conectandoMarcador = false;
+    detenerHeartbeatMarcador();
+    // El marcador se mantiene intentando reconectar.
+    programarReconectarMarcador();
+  };
+}
+//======================================================
+// TRANSMITIR GOL AL MARCADOR
+//======================================================
+function transmitirGol(comando) {
+  if (
+    !socketMarcador ||
+    socketMarcador.readyState !== WebSocket.OPEN ||
+    !marcadorConectado
+  ) {
+    golPendiente = comando;
+    conectarMarcador();
+    return;
+  }
   var mensaje = {
-    topic: "realtime:partido:" + codigoPartido,
+    topic: "realtime:partido:marcador",
     event: "broadcast",
     payload: {
       type: "broadcast",
       event: "comando",
       payload: {
-        comando: "verificar",
-      },
-    },
-    ref: "2",
-  };
-
-  socketSupabase.send(JSON.stringify(mensaje));
-
-  verificacionTimer = setTimeout(function () {
-    if (!codigoVerificado) {
-      alert("CÓDIGO INCORRECTO");
-
-      socketSupabase.close();
-
-      btnConectar.disabled = false;
-      btnConectar.innerHTML = "CONECTAR";
-    }
-  }, 10000);
-}
-
-// //=========================================
-// // CONECTAR CON SUPABASE - RTA DE GEMINI
-// //=========================================
-//=========================================
-// CONECTAR CON SUPABASE (control.js)
-//=========================================
-function conectarSupabase() {
-  try {
-    socketSupabase = new WebSocket(SUPABASE_URL);
-
-    socketSupabase.onopen = function () {
-      var mensaje = {
-        topic: "realtime:partido:" + codigoPartido,
-        event: "phx_join",
-        payload: {
-          config: {
-            broadcast: { ack: false, self: true },
-            presence: { enabled: false },
-            postgres_changes: [],
-          },
-        },
-        ref: "1",
-        join_ref: "1",
-      };
-      socketSupabase.send(JSON.stringify(mensaje));
-    };
-
-    socketSupabase.onmessage = function (evento) {
-      try {
-        var respuesta = JSON.parse(evento.data);
-
-        // 1. SUPABASE ACEPTÓ EL CANAL
-        if (
-          respuesta.event == "phx_reply" &&
-          respuesta.payload &&
-          respuesta.payload.status == "ok"
-        ) {
-          supabaseConectado = true;
-          enviarVerificacion();
-          return;
-        }
-
-        // 2. FILTRAR Y PROCESAR ÚNICAMENTE LA RESPUESTA DEL IPAD
-        if (
-          respuesta.event == "broadcast" &&
-          respuesta.payload &&
-          respuesta.payload.payload
-        ) {
-          var payloadData = respuesta.payload.payload;
-
-          // Ignorar comandos salientes del celular (como 'verificar')
-          if (payloadData.comando === "verificar") {
-            return;
-          }
-
-          // Solo evaluar si es una respuesta explícita del iPad
-          if (
-            payloadData.event === "respuesta" ||
-            payloadData.respuesta === "codigo_ok" ||
-            payloadData.codigo
-          ) {
-            var codigoDelIPad = payloadData.codigo || payloadData.respuesta;
-            var ipadLimpio = String(codigoDelIPad).trim().toUpperCase();
-            var celuLimpio = String(codigoPartido).trim().toUpperCase();
-
-            // Validación del código
-            if (
-              ipadLimpio === celuLimpio ||
-              payloadData.respuesta === "codigo_ok"
-            ) {
-              codigoVerificado = true;
-
-              if (verificacionTimer) {
-                clearTimeout(verificacionTimer);
-              }
-
-              // MENSAJE ÚNICO DE ÉXITO
-              alert("CONECTADO CON ÉXITO");
-
-              pantallaConexion.style.display = "none";
-              pantallaControl.style.display = "block";
-
-              // Configurar control listo para iniciar
-              pausado = true;
-              btnCronometro.innerHTML = "INICIAR / REANUDAR";
-              btnCronometro.style.background = "#2e7d32";
-            }
-          }
-        }
-      } catch (e) {
-        console.log("MENSAJE SUPABASE:", evento.data);
+        comando: comando
       }
-    };
-
-    socketSupabase.onerror = function () {
-      supabaseConectado = false;
-    };
-
-    socketSupabase.onclose = function () {
-      supabaseConectado = false;
-    };
-  } catch (e) {}
+    },
+    ref: "gol"
+  };
+  try {
+    socketMarcador.send(JSON.stringify(mensaje));
+  } catch (e) {
+    golPendiente = comando;
+    marcadorConectado = false;
+    try {
+      socketMarcador.close();
+    } catch (err) {}
+  }
 }
-// //=========================================
-// // CONECTAR CON SUPABASE
-// //=========================================
-// function conectarSupabase() {
-//   try {
-//     socketSupabase = new WebSocket(SUPABASE_URL);
-//     socketSupabase.onopen = function () {
-//       var mensaje = {
-//         topic: "realtime:partido:" + codigoPartido,
-//         event: "phx_join",
-//         payload: {
-//           config: {
-//             broadcast: {
-//               ack: false,
-//               self: true,
-//             },
-//             presence: {
-//               enabled: false,
-//             },
-//             postgres_changes: [],
-//           },
-//         },
-//         ref: "1",
-//         join_ref: "1",
-//       };
-//       socketSupabase.send(JSON.stringify(mensaje));
-//     };
-//     socketSupabase.onmessage = function (evento) {
-//       var respuesta;
-
-//       try {
-//         respuesta = JSON.parse(evento.data);
-
-//         //=========================================
-//         // 1. SUPABASE ACEPTÓ EL CANAL
-//         //=========================================
-
-//         if (
-//           respuesta.event == "phx_reply" &&
-//           respuesta.payload &&
-//           respuesta.payload.status == "ok"
-//         ) {
-//           supabaseConectado = true;
-
-//           enviarVerificacion();
-//         }
-
-//         //=========================================
-//         // 2. RESPUESTA DEL IPAD
-//         //=========================================
-
-//         if (
-//           respuesta.event == "broadcast" &&
-//           respuesta.payload &&
-//           respuesta.payload.payload &&
-//           respuesta.payload.payload.codigo
-//         ) {
-//           var codigoDelIPad = respuesta.payload.payload.codigo;
-
-//           var codigoDelCelular = codigoPartido;
-
-//           //=========================================
-//           // COMPARAR SOLAMENTE LOS DOS CODIGOS
-//           //=========================================
-
-//           if (codigoDelIPad == codigoDelCelular) {
-//             alert("No entra al if");
-//             alert(
-//               `"Codigo del ipad:" & codigoDelIPad & "Codigo del celu:" & codigoDelCelular`,
-//             );
-//             codigoVerificado = true;
-
-//             clearTimeout(verificacionTimer);
-
-//             pantallaConexion.style.display = "none";
-//             pantallaControl.style.display = "block";
-
-//             pausado = false;
-
-//             btnCronometro.innerHTML = "PAUSAR";
-//             btnCronometro.style.background = "#d32f2f";
-//           }
-//         }
-//       } catch (e) {
-//         console.log("MENSAJE SUPABASE:", evento.data);
-//       }
-//     };
-//     socketSupabase.onerror = function () {
-//       supabaseConectado = false;
-//     };
-//     socketSupabase.onclose = function () {
-//       supabaseConectado = false;
-//     };
-//   } catch (e) {}
-// }
-//=========================================
+//======================================================
+// ENVIAR COMANDO DE GOL
+//======================================================
+function enviarComandoGol(comando) {
+  // Si el marcador está conectado,
+  // enviar directamente.
+  if (
+    socketMarcador &&
+    socketMarcador.readyState === WebSocket.OPEN &&
+    marcadorConectado
+  ) {
+    transmitirGol(comando);
+    return;
+  }
+  // Si no está conectado,
+  // guardar el gol y conectar.
+  golPendiente = comando;
+  conectarMarcador();
+}
+//======================================================
 // PAUSAR CRONÓMETRO
-//=========================================
+//======================================================
 function pausarCronometro() {
-  if (pausado) return;
+  if (pausado) {
+    return;
+  }
   pausado = true;
   btnCronometro.innerHTML = "REANUDAR";
   btnCronometro.style.background = "#2e7d32";
   enviarComando("pausar");
 }
-//=========================================
+//======================================================
 // REANUDAR CRONÓMETRO
-//=========================================
+//======================================================
 function reanudarCronometro() {
-  if (!pausado) return;
+  if (!pausado) {
+    return;
+  }
   pausado = false;
   btnCronometro.innerHTML = "PAUSAR";
   btnCronometro.style.background = "#d32f2f";
   enviarComando("reanudar");
 }
-//=========================================
-// CONECTAR
-//=========================================
+//======================================================
+// BOTÓN CONECTAR
+//======================================================
 btnConectar.onclick = function () {
   codigoPartido = codigo.value.toUpperCase().trim();
   if (codigoPartido.length != 3) {
@@ -452,11 +674,13 @@ btnConectar.onclick = function () {
   }
   btnConectar.disabled = true;
   btnConectar.innerHTML = "CONECTANDO...";
+  codigoVerificado = false;
+  supabaseConectado = false;
   conectarSupabase();
 };
-//=========================================
+//======================================================
 // BOTÓN PRINCIPAL
-//=========================================
+//======================================================
 btnCronometro.onclick = function () {
   ejecutarAccion(function () {
     if (pausado) {
@@ -466,9 +690,9 @@ btnCronometro.onclick = function () {
     }
   });
 };
-//=========================================
+//======================================================
 // GOL AZUL
-//=========================================
+//======================================================
 golAzul.onclick = function () {
   ejecutarAccion(function () {
     enviarComandoGol("golAzul");
@@ -476,9 +700,9 @@ golAzul.onclick = function () {
     pausarCronometro();
   });
 };
-//=========================================
+//======================================================
 // GOL ROJO
-//=========================================
+//======================================================
 golRojo.onclick = function () {
   ejecutarAccion(function () {
     enviarComandoGol("golRojo");
