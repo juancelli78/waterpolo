@@ -1,5 +1,5 @@
 /******************************************
-FUENTES
+ FUENTE
 ******************************************/
 @font-face {
   font-family: "Bebas";
@@ -7,14 +7,12 @@ FUENTES
   font-weight: normal;
   font-style: normal;
 }
-
 /******************************************
-GENERAL
+ GENERAL
 ******************************************/
 * {
   box-sizing: border-box;
 }
-
 html,
 body {
   margin: 0;
@@ -26,14 +24,11 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #031327;
 }
-
 /******************************************
-PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
+ CONFIGURACIÓN
 ******************************************/
 #pantallaConfiguracion {
   position: absolute;
@@ -41,7 +36,6 @@ PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
   top: 0;
   width: 100%;
   height: 100%;
-  /* Fondo degradado estilo profundidad marina */
   background: radial-gradient(circle at 50% 20%, #0a2f52 0%, #031327 100%);
   color: #ffffff;
   padding: 30px;
@@ -50,7 +44,6 @@ PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
   justify-content: space-between;
   align-items: center;
 }
-
 #pantallaConfiguracion h1 {
   margin: 10px 0 20px 0;
   text-align: center;
@@ -58,17 +51,13 @@ PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
   font-weight: 700;
   letter-spacing: 3px;
   color: #00e5ff;
-  text-transform: uppercase;
 }
-
 .configContainer {
   width: 100%;
   max-width: 900px;
   display: flex;
   justify-content: space-between;
-  gap: 20px;
 }
-
 .columna {
   width: 48%;
   background: rgba(255, 255, 255, 0.05);
@@ -76,31 +65,22 @@ PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
   border-radius: 12px;
   padding: 20px;
 }
-
 .columna h2 {
   text-align: center;
   margin: 0 0 20px 0;
   font-size: 22px;
-  font-weight: 600;
   color: #00e5ff;
-  letter-spacing: 1.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 10px;
 }
-
 .fila {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 15px 0;
 }
-
 .fila label {
   font-size: 20px;
   color: #e0f7fa;
-  font-weight: 500;
 }
-
 .fila input {
   width: 75px;
   height: 48px;
@@ -113,16 +93,9 @@ PANTALLA CONFIGURACIÓN (Estética Waterpolo Minimalista)
   border-radius: 8px;
   outline: none;
   -webkit-appearance: none;
-  appearance: none;
 }
-
-.fila input:focus {
-  border-color: #00e5ff;
-  background-color: rgba(255, 255, 255, 0.18);
-}
-
 /******************************************
-BOTÓN INICIAR
+ BOTÓN INICIAR
 ******************************************/
 #btnIniciar {
   display: block;
@@ -137,38 +110,84 @@ BOTÓN INICIAR
   background: #00e5ff;
   border: none;
   border-radius: 30px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
   -webkit-appearance: none;
-  appearance: none;
 }
-
-#btnIniciar:active {
-  background: #00b8d4;
-  transform: scale(0.98);
-}
-
 /******************************************
-CÓDIGO DE CONEXIÓN
+ CÓDIGO CONFIGURACIÓN
 ******************************************/
-#codigoPartido {
+#codigoConfiguracion {
   position: absolute;
   top: 15px;
   right: 20px;
-  font-family: monospace, Arial, sans-serif;
+  font-family: monospace;
   font-size: 18px;
   font-weight: bold;
   color: #00e5ff;
-  opacity: 0.8;
-  background: rgba(0, 229, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(0, 229, 255, 0.2);
-  pointer-events: none;
 }
-
 /******************************************
-PANTALLA CRONÓMETRO
+ LOADING
+******************************************/
+#pantallaLoading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: #031327;
+  color: #ffffff;
+  text-align: center;
+}
+.loadingTexto {
+  position: absolute;
+  top: 42%;
+  width: 100%;
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: #00e5ff;
+}
+#loadingEstado {
+  position: absolute;
+  top: 62%;
+  width: 100%;
+  font-size: 16px;
+  color: #888888;
+}
+/******************************************
+ SPINNER
+******************************************/
+.spinner {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 38px;
+  height: 38px;
+  margin-left: -19px;
+  margin-top: -19px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #00e5ff;
+  border-radius: 50%;
+  -webkit-animation: girar 0.9s linear infinite;
+  animation: girar 0.9s linear infinite;
+}
+@-webkit-keyframes girar {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/******************************************
+ CRONÓMETRO
 ******************************************/
 #pantallaCronometro {
   position: absolute;
@@ -176,11 +195,44 @@ PANTALLA CRONÓMETRO
   top: 0;
   width: 100%;
   height: 100%;
-  display: none;
   background: #000000;
   color: #ffffff;
 }
-
+/******************************************
+ CÓDIGO EN EL CRONÓMETRO
+******************************************/
+#codigoCronometro {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  padding: 4px 8px;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #00e5ff;
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  border-radius: 4px;
+  z-index: 20;
+}
+/******************************************
+ ESTADO SUPABASE
+******************************************/
+#estadoConexion {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  color: #55cc55;
+  z-index: 20;
+}
+#estadoConexion.desconectado {
+  color: #ff4444;
+}
+/******************************************
+ PERÍODO
+******************************************/
 #periodo {
   position: absolute;
   top: 12px;
@@ -191,7 +243,39 @@ PANTALLA CRONÓMETRO
   letter-spacing: 3px;
   font-weight: bold;
 }
-
+/******************************************
+ CRONÓMETRO
+******************************************/
+#cronometro {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  line-height: 0.72;
+  overflow: visible;
+  font-family: "Bebas", Arial, sans-serif;
+  letter-spacing: 0.5rem;
+}
+#mm,
+#ss {
+  font-family: "Bebas", Arial, sans-serif;
+  font-size: 48vw;
+  font-weight: 400;
+  line-height: 0.72;
+}
+#dp {
+  font-family: "Bebas", Arial, sans-serif;
+  font-size: 48vw;
+  font-weight: 400;
+  line-height: 0.72;
+  position: relative;
+  top: -0.08em;
+}
+/******************************************
+ ESTADO
+******************************************/
 #estado {
   position: absolute;
   bottom: 12px;
@@ -201,47 +285,34 @@ PANTALLA CRONÓMETRO
   font-size: 18px;
   letter-spacing: 1px;
 }
-
-#cronometro {
+/******************************************
+ BOTÓN RECONECTAR
+******************************************/
+#btnReconectar {
   position: absolute;
   left: 50%;
-  top: 55%;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-  line-height: 0.72;
-  overflow: visible;
-  font-family: "Bebas", Arial, sans-serif;
-  letter-spacing: 0.5rem;
+  bottom: 45px;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  height: 32px;
+  padding: 0 15px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #444444;
+  border: 1px solid #777777;
+  border-radius: 4px;
+  -webkit-appearance: none;
 }
-
-#mm,
-#ss {
-  font-family: "Bebas", Arial, sans-serif;
-  font-size: 48vw;
-  font-weight: 400;
-  line-height: 0.72;
-}
-
-#dp {
-  font-family: "Bebas", Arial, sans-serif;
-  font-size: 48vw;
-  font-weight: 400;
-  line-height: 0.72;
-  position: relative;
-  top: -0.08em;
-}
-
 /******************************************
-ESTADOS DE COLOR CRONÓMETRO
+ COLORES CRONÓMETRO
 ******************************************/
 .rojo {
   color: #ff3366 !important;
 }
-
 .descanso {
   color: #00e5ff !important;
 }
-
 .fin {
   color: #00ff88 !important;
 }

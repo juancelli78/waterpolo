@@ -1,9 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cronometro WaterPolo</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Cronómetro WaterPolo</title>
     <link rel="stylesheet" href="style1.css" />
   </head>
   <body>
@@ -12,9 +15,8 @@
     <!-- ========================================= -->
     <div id="pantallaConfiguracion">
       <h1>CONFIGURACIÓN</h1>
-      <div id="codigoPartido"></div>
+      <div id="codigoConfiguracion"></div>
       <div class="configContainer">
-        <!-- CUARTOS -->
         <div class="columna">
           <h2>CUARTOS</h2>
           <div class="fila">
@@ -34,7 +36,6 @@
             <input id="q4" type="number" min="1" max="99" value="8" />
           </div>
         </div>
-        <!-- DESCANSOS -->
         <div class="columna">
           <h2>DESCANSOS</h2>
           <div class="fila">
@@ -54,17 +55,35 @@
       <button id="btnIniciar">INICIAR PARTIDO</button>
     </div>
     <!-- ========================================= -->
-    <!-- PANTALLA DEL CRONÓMETRO -->
+    <!-- PANTALLA LOADING -->
+    <!-- ========================================= -->
+    <div id="pantallaLoading">
+      <div class="loadingTexto">CONECTANDO</div>
+      <div class="spinner"></div>
+      <div id="loadingEstado">ESPERANDO SUPABASE...</div>
+    </div>
+    <!-- ========================================= -->
+    <!-- PANTALLA CRONÓMETRO -->
     <!-- ========================================= -->
     <div id="pantallaCronometro" style="display: none">
+      <!-- CÓDIGO DEL PARTIDO -->
+      <div id="codigoCronometro">
+        <span id="codigoTexto"></span>
+      </div>
+      <!-- ESTADO SUPABASE -->
+      <div id="estadoConexion">SUPABASE ✓</div>
+      <!-- PERÍODO -->
       <div id="periodo">PERÍODO 1</div>
-      <div id="codigoPartido"></div>
+      <!-- CRONÓMETRO -->
       <div id="cronometro">
         <span id="mm">08</span>
         <span id="dp">:</span>
         <span id="ss">00</span>
       </div>
-      <div id="estado">TOCAR PARA INICIAR</div>
+      <!-- ESTADO -->
+      <div id="estado">ESPERANDO AL CONTROL...</div>
+      <!-- BOTÓN DE RECONEXIÓN -->
+      <button id="btnReconectar" style="display: none">RECONECTAR</button>
     </div>
     <script src="app26.js"></script>
   </body>
