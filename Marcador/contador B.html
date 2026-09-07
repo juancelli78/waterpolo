@@ -8,7 +8,7 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
 
-    <title>MARCADOR AZUL</title>
+    <title>MARCADOR</title>
 
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -17,11 +17,35 @@
     ontouchstart="touchStart(event)"
     ontouchmove="touchMove(event)"
     ontouchend="touchEnd(event)"
-    onclick="clickDesktop()"
-    class="azul"
+    onclick="clickDesktop(event)"
+    class="rojo"
   >
+    <!-- CONTROLES DE COLOR -->
+    <div id="controlesColor" onclick="detenerClickMarcador(event)">
+      <label class="controlColor">
+        <span>F</span>
+        <input
+          type="color"
+          id="colorFondo"
+          value="#d50000"
+          onchange="cambiarFondo(this.value)"
+        />
+      </label>
+
+      <label class="controlColor">
+        <span>N</span>
+        <input
+          type="color"
+          id="colorNumero"
+          value="#ffffff"
+          onchange="cambiarNumero(this.value)"
+        />
+      </label>
+    </div>
+
+    <!-- MARCADOR -->
     <div id="contador">0</div>
 
-    <script src="./marcador.js"></script>
+    <script src="marcador.js"></script>
   </body>
 </html>
