@@ -2,153 +2,202 @@ html,
 body {
   margin: 0;
   padding: 0;
-
   width: 100%;
   height: 100%;
-
   overflow: hidden;
-
   background: #ffffff;
-
   font-family: Arial, Helvetica, sans-serif;
-
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
-
   -webkit-touch-callout: none;
 }
-
-/* =========================================
-   COLORES ORIGINALES DE LOS EQUIPOS
-   ========================================= */
-
+/* COLORES ORIGINALES */
 body.rojo {
   background: #d50000;
   color: white;
 }
-
 body.azul {
   background: #0d47a1;
   color: white;
 }
-
 /* =========================================
-   CONTROLES DE COLOR
+   SELECTOR DE COLORES
    ========================================= */
-
 #controlesColor {
   position: fixed;
-
   top: 6px;
   left: 6px;
-
-  z-index: 1000;
-
-  width: 54px;
-  height: 28px;
-
-  display: block;
-
-  -webkit-user-select: none;
-  user-select: none;
+  z-index: 3000;
 }
-
-/* Cada pequeño botón */
-
-.controlColor {
-  display: inline-block;
-
-  width: 24px;
-  height: 24px;
-
-  margin-right: 2px;
-
-  position: relative;
-
-  border: 1px solid rgba(255, 255, 255, 0.7);
-
-  background: rgba(0, 0, 0, 0.35);
-
-  border-radius: 3px;
-
-  box-sizing: border-box;
-
-  overflow: hidden;
-}
-
-/* Letra F / N */
-
-.controlColor span {
-  position: absolute;
-
-  left: 0;
-  top: 0;
-
-  width: 100%;
-  height: 100%;
-
-  text-align: center;
-
-  line-height: 24px;
-
-  font-family: Arial, Helvetica, sans-serif;
-
-  font-size: 11px;
-
-  font-weight: bold;
-
-  color: white;
-
-  pointer-events: none;
-
-  z-index: 1;
-}
-
-/* Selector de color */
-
-.controlColor input {
-  position: absolute;
-
-  left: 0;
-  top: 0;
-
-  width: 100%;
-  height: 100%;
-
+#btnPaleta {
+  width: 34px;
+  height: 34px;
   padding: 0;
-  margin: 0;
-
-  border: 0;
-
-  opacity: 0.01;
-
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-size: 20px;
   cursor: pointer;
-
-  z-index: 2;
 }
-
+#panelColores {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 210px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #17232c;
+  border: 1px solid #607d8b;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+#panelColores.abierto {
+  display: block;
+}
+.grupoColor {
+  margin-bottom: 12px;
+}
+.grupoColor:last-child {
+  margin-bottom: 0;
+}
+.grupoColor p {
+  margin: 0 0 9px 0;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.paleta {
+  font-size: 0;
+}
+.muestraColor {
+  display: inline-block;
+  width: 31px;
+  height: 31px;
+  margin: 2px;
+  padding: 0;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
 /* =========================================
-   NÚMERO
+   NÚMERO DEL MARCADOR
    ========================================= */
-
 #contador {
   width: 100%;
   height: 100%;
-
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-
   font-size: 60vh;
-
   font-weight: bold;
+}
+/* =========================================
+   IDENTIFICACIÓN DEL PARTIDO
+   ========================================= */
+#identificacion {
+  position: fixed;
+  top: 15px;
+  right: 18px;
+  z-index: 1000;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: right;
+  pointer-events: none;
+}
+#nombreEquipo {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+#codigoVisible {
+  display: block;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+}
+#estadoConexion {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+/* =========================================
+   INGRESO DEL CÓDIGO
+   ========================================= */
+#ingresoCodigo {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  display: none;
+  background: rgba(0, 0, 0, 0.88);
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+.cajaCodigo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 85%;
+  max-width: 360px;
+  padding: 30px 20px;
+  box-sizing: border-box;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  color: white;
+  background: #17232c;
+  border: 1px solid #4b879b;
+  border-radius: 12px;
+}
+.cajaCodigo h2 {
+  margin: 0 0 15px 0;
+  font-size: 22px;
+}
+.cajaCodigo p {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+}
+#codigoInput {
+  width: 100%;
+  padding: 14px;
+  box-sizing: border-box;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  font-size: 25px;
+  font-weight: bold;
+  border: 1px solid #78909c;
+  border-radius: 6px;
+}
+#btnConectar {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #1685a5;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+}
+#mensajeCodigo {
+  margin-top: 15px !important;
+  color: #ffb6b6;
 }
