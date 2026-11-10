@@ -270,10 +270,12 @@ function conectarSupabase() {
         var ipadLimpio = String(codigoDelIPad).trim().toUpperCase();
         var celuLimpio = String(codigoPartido).trim().toUpperCase();
         if (
-          ipadLimpio === celuLimpio ||
-          payloadData.respuesta === "codigo_ok"
+          payloadData.respuesta === "codigo_ok" &&
+          ipadLimpio === celuLimpio
         ) {
           codigoVerificado = true;
+          // Conectar también con los marcadores del partido.
+          conectarMarcador();
           if (verificacionTimer) {
             clearTimeout(verificacionTimer);
             verificacionTimer = null;
@@ -467,6 +469,7 @@ function programarReconectarMarcador() {
 // CONECTAR MARCADOR
 //======================================================
 function conectarMarcador() {
+  if (!codigoVerificado || !codigoPartido) return;
   if (conectandoMarcador) {
     return;
   }
@@ -492,7 +495,7 @@ function conectarMarcador() {
     }
     conectandoMarcador = false;
     var mensaje = {
-      topic: "realtime:partido:marcador",
+      topic: "realtime:partido:" + codigoPartido,
       event: "phx_join",
       payload: {
         config: {
@@ -599,7 +602,7 @@ function transmitirGol(comando) {
     return;
   }
   var mensaje = {
-    topic: "realtime:partido:marcador",
+    topic: "realtime:partido:" + codigoPartido,
     event: "broadcast",
     payload: {
       type: "broadcast",
@@ -668,7 +671,7 @@ function reanudarCronometro() {
 //======================================================
 btnConectar.onclick = function () {
   codigoPartido = codigo.value.toUpperCase().trim();
-  if (codigoPartido.length != 3) {
+  if (!/^[A-Z0-9]{3}$/.test(codigoPartido)) {
     alert("Ingrese un código válido");
     return;
   }
