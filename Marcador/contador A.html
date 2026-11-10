@@ -2,50 +2,153 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-
-    <title>MARCADOR</title>
-
+    <title>MARCADOR A</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
-
-  <body
-    ontouchstart="touchStart(event)"
-    ontouchmove="touchMove(event)"
-    ontouchend="touchEnd(event)"
-    onclick="clickDesktop(event)"
-    class="rojo"
-  >
-    <!-- CONTROLES DE COLOR -->
-    <div id="controlesColor" onclick="detenerClickMarcador(event)">
-      <label class="controlColor">
-        <span>F</span>
-        <input
-          type="color"
-          id="colorFondo"
-          value="#d50000"
-          onchange="cambiarFondo(this.value)"
-        />
-      </label>
-
-      <label class="controlColor">
-        <span>N</span>
-        <input
-          type="color"
-          id="colorNumero"
-          value="#ffffff"
-          onchange="cambiarNumero(this.value)"
-        />
-      </label>
+  <body class="rojo">
+    <!-- SELECTOR DE COLORES -->
+    <div id="controlesColor">
+      <button id="btnPaleta" type="button" aria-label="Cambiar colores">
+        &#127912;
+      </button>
+      <div id="panelColores">
+        <div class="grupoColor">
+          <p>COLOR DE FONDO</p>
+          <div class="paleta">
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#d50000"
+              style="background: #d50000"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#0d47a1"
+              style="background: #0d47a1"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#000000"
+              style="background: #000000"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#ffffff"
+              style="background: #ffffff"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#16a34a"
+              style="background: #16a34a"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#facc15"
+              style="background: #facc15"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#808080"
+              style="background: #808080"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="fondo"
+              data-color="#ff6d00"
+              style="background: #ff6d00"
+            ></button>
+          </div>
+        </div>
+        <div class="grupoColor">
+          <p>COLOR DE NÚMEROS</p>
+          <div class="paleta">
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#ffffff"
+              style="background: #ffffff"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#000000"
+              style="background: #000000"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#facc15"
+              style="background: #facc15"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#ff0000"
+              style="background: #ff0000"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#00e5ff"
+              style="background: #00e5ff"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#00ff00"
+              style="background: #00ff00"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#ff9800"
+              style="background: #ff9800"
+            ></button>
+            <button
+              class="muestraColor"
+              data-tipo="numero"
+              data-color="#808080"
+              style="background: #808080"
+            ></button>
+          </div>
+        </div>
+      </div>
     </div>
-
+    <!-- IDENTIFICACIÓN DEL PARTIDO -->
+    <div id="identificacion">
+      <span id="nombreEquipo">EQUIPO A</span>
+      <span id="codigoVisible">---</span>
+      <span id="estadoConexion">DESCONECTADO</span>
+    </div>
     <!-- MARCADOR -->
     <div id="contador">0</div>
-
+    <!-- INGRESO DEL CÓDIGO -->
+    <div id="ingresoCodigo">
+      <div class="cajaCodigo">
+        <h2>MARCADOR A</h2>
+        <p>Ingresá el código del partido</p>
+        <input
+          id="codigoInput"
+          type="text"
+          maxlength="3"
+          placeholder="A7K"
+          autocomplete="off"
+        />
+        <button id="btnConectar" type="button">CONECTAR</button>
+        <p id="mensajeCodigo"></p>
+      </div>
+    </div>
     <script src="marcador.js"></script>
   </body>
 </html>
+
