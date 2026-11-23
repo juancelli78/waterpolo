@@ -101,7 +101,7 @@ body.azul {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  font-size: 60vh;
+  font-size: 80vh;
   font-weight: bold;
 }
 /* =========================================
@@ -200,4 +200,25 @@ body.azul {
 #mensajeCodigo {
   margin-top: 15px !important;
   color: #ffb6b6;
+}
+
+/*===============================
+AGREGADO LOCAL Y VISITANTE
+==============================*/
+/* =========================================
+   IDENTIFICACIÓN LOCAL / VISITANTE
+   ========================================= */
+#etiquetaEquipo {
+  position: fixed;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  pointer-events: none;
 }
